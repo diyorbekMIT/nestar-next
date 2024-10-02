@@ -30,7 +30,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 
 	
     const {
-		loading: getPropertyLoading,
+		loading: getPropertiesLoading,
 		data: getPropertiesData,
 		error: getPropertiesError,
 		refetch: getPropertiesRefetch,
