@@ -93,7 +93,7 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 			sort: "createdAt",
 			direction: Direction.DESC,
 			search: {
-				locationList: property?.propertyLocation ? [property?.propertyLocation] : [];
+				locationList: property?.propertyLocation ? [property?.propertyLocation] : []
 			},
 		} },
 		notifyOnNetworkStatusChange: true,
