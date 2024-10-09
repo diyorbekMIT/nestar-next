@@ -16,6 +16,10 @@ import { Member } from '../../../libs/types/member/member';
 import { MemberStatus, MemberType } from '../../../libs/enums/member.enum';
 import { sweetErrorHandling } from '../../../libs/sweetAlert';
 import { MemberUpdate } from '../../../libs/types/member/member.update';
+import { GET_ALL_MEMBERS_BY_ADMIN } from '../../../apollo/admin/query';
+import { useMutation, useQuery } from '@apollo/client';
+import { UPDATE_MEMBER_BY_ADMIN } from '../../../apollo/admin/mutation';
+import { T } from '../../../libs/types/common';
 
 const AdminUsers: NextPage = ({ initialInquiry, ...props }: any) => {
 	const [anchorEl, setAnchorEl] = useState<[] | HTMLElement[]>([]);
@@ -30,8 +34,28 @@ const AdminUsers: NextPage = ({ initialInquiry, ...props }: any) => {
 
 	/** APOLLO REQUESTS **/
 
+	const [updateMemberByAdmin] = useMutation(UPDATE_MEMBER_BY_ADMIN);
+
+	const {
+		loading: getAllMembersByAdminLoading,
+		data: getAllMembersByAdminData,
+		error: getAllMembersByAdminError,
+		refetch: getAllMembersRefetch,
+	} = useQuery(GET_ALL_MEMBERS_BY_ADMIN, {
+		fetchPolicy: 'network-only',
+		variables: { input: membersInquiry },
+		notifyOnNetworkStatusChange: true,
+		onCompleted: (data: T) => {
+			setMembers(data?.getAllMembersByAdmin?.list);
+			setMembersTotal(data?.getAllMembersByAdmin?.metaCounter[0]?.total ?? 0);
+	},
+	});
+
 	/** LIFECYCLES **/
-	useEffect(() => {}, [membersInquiry]);
+	useEffect(() => {
+		getAllMembersRefetch({ input: membersInquiry }).then();
+	  }, [membersInquiry]);
+
 
 	/** HANDLERS **/
 	const changePageHandler = async (event: unknown, newPage: number) => {
@@ -80,11 +104,18 @@ const AdminUsers: NextPage = ({ initialInquiry, ...props }: any) => {
 
 	const updateMemberHandler = async (updateData: MemberUpdate) => {
 		try {
-			menuIconCloseHandler();
+		  await updateMemberByAdmin({
+			variables: {
+			  input: updateData,
+			},
+		  });
+	  
+		  menuIconCloseHandler();
+		  await getAllMembersRefetch({ input: membersInquiry });
 		} catch (err: any) {
-			sweetErrorHandling(err).then();
+		  sweetErrorHandling(err).then();
 		}
-	};
+	  };
 
 	const textHandler = useCallback((value: string) => {
 		try {
