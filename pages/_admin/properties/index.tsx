@@ -14,6 +14,10 @@ import { Property } from '../../../libs/types/property/property';
 import { PropertyLocation, PropertyStatus } from '../../../libs/enums/property.enum';
 import { sweetConfirmAlert, sweetErrorHandling } from '../../../libs/sweetAlert';
 import { PropertyUpdate } from '../../../libs/types/property/property.update';
+import { useMutation, useQuery } from '@apollo/client';
+import { REMOVE_PROPERTY_BY_ADMIN, UPDATE_PROPERTY_BY_ADMIN } from '../../../apollo/admin/mutation';
+import { GET_ALL_PROPERTIES_BY_ADMIN } from '../../../apollo/admin/query';
+import { T } from '../../../libs/types/common';
 
 const AdminProperties: NextPage = ({ initialInquiry, ...props }: any) => {
 	const [anchorEl, setAnchorEl] = useState<[] | HTMLElement[]>([]);
@@ -25,20 +29,42 @@ const AdminProperties: NextPage = ({ initialInquiry, ...props }: any) => {
 	);
 	const [searchType, setSearchType] = useState('ALL');
 
-	/** APOLLO REQUESTS **/
+	const [updatePropertyByAdmin] = useMutation(UPDATE_PROPERTY_BY_ADMIN);
+    const [removePropertyByAdmin] = useMutation(REMOVE_PROPERTY_BY_ADMIN);
+
+	const {
+		loading: getAllPropertiesByAdminLoading,
+		data: getAllPropertiesByAdminData,
+		error: getAllPropertiesByAdminError,
+		refetch: getAllPropertiesByAdminRefetch,
+	} = useQuery(GET_ALL_PROPERTIES_BY_ADMIN, {
+		fetchPolicy: 'network-only',
+		variables: { input: propertiesInquiry },
+		notifyOnNetworkStatusChange: true,
+		onCompleted: (data: T) => {
+			setProperties(data?.getAllPropertiesByAdmin?.list);
+			setPropertiesTotal(data?.getAllPropertiesByAdmin?.metaCounter[0]?.total ?? 0);
+		},
+	});
+
+
 
 	/** LIFECYCLES **/
-	useEffect(() => {}, [propertiesInquiry]);
+	useEffect(() => {
+		getAllPropertiesByAdminRefetch({ input: propertiesInquiry }).then();
+	}, [propertiesInquiry]);
 
 	/** HANDLERS **/
 	const changePageHandler = async (event: unknown, newPage: number) => {
 		propertiesInquiry.page = newPage + 1;
+		await getAllPropertiesByAdminRefetch({ input: propertiesInquiry});
 		setPropertiesInquiry({ ...propertiesInquiry });
 	};
 
 	const changeRowsPerPageHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		propertiesInquiry.limit = parseInt(event.target.value, 10);
 		propertiesInquiry.page = 1;
+		await getAllPropertiesByAdminRefetch({ input: propertiesInquiry});
 		setPropertiesInquiry({ ...propertiesInquiry });
 	};
 
@@ -76,13 +102,20 @@ const AdminProperties: NextPage = ({ initialInquiry, ...props }: any) => {
 
 	const removePropertyHandler = async (id: string) => {
 		try {
-			if (await sweetConfirmAlert('Are you sure to remove?')) {
-			}
-			menuIconCloseHandler();
+		  if (await sweetConfirmAlert('Are you sure you want to remove?')) {
+			await removePropertyByAdmin({
+			  variables: {
+				input: id,
+			  },
+			});
+	  
+			await getAllPropertiesByAdminRefetch({ input: propertiesInquiry });
+		  }
 		} catch (err: any) {
-			sweetErrorHandling(err).then();
+		  menuIconCloseHandler();
+		  sweetErrorHandling(err).then();
 		}
-	};
+	  };
 
 	const searchTypeHandler = async (newValue: string) => {
 		try {
@@ -108,14 +141,22 @@ const AdminProperties: NextPage = ({ initialInquiry, ...props }: any) => {
 	};
 
 	const updatePropertyHandler = async (updateData: PropertyUpdate) => {
-		try {
-			console.log('+updateData: ', updateData);
-			menuIconCloseHandler();
-		} catch (err: any) {
-			menuIconCloseHandler();
-			sweetErrorHandling(err).then();
-		}
-	};
+	try {
+		console.log('+updateData:', updateData);
+
+		await updatePropertyByAdmin({
+		variables: {
+			input: updateData,
+		},
+		});
+
+		menuIconCloseHandler();
+		await getAllPropertiesByAdminRefetch({ input: propertiesInquiry });
+	} catch (err: any) {
+		menuIconCloseHandler();
+		sweetErrorHandling(err).then();
+	}
+   };
 
 	return (
 		<Box component={'div'} className={'content'}>
