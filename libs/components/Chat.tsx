@@ -6,26 +6,27 @@ import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import MarkChatUnreadIcon from '@mui/icons-material/MarkChatUnread';
 import { useRouter } from 'next/router';
 import ScrollableFeed from 'react-scrollable-feed';
+import { RippleBadge } from '../../scss/MaterialTheme/styled';
 
 const NewMessage = (type: any) => {
-	if (type === 'right') {
+	if (type === "right") {
 		return (
 			<Box
-				component={'div'}
-				flexDirection={'row'}
-				style={{ display: 'flex' }}
-				alignItems={'flex-end'}
-				justifyContent={'flex-end'}
-				sx={{ m: '10px 0px' }}
+				component={"div"}
+				flexDirection={"row"}
+				style={{ display: "flex" }}
+				alignItems={"flex-end"}
+				justifyContent={"flex-end"}
+				sx={{ m: "10px 0px" }}
 			>
-				<div className={'msg_right'}></div>
+				<div className={"msg_right"}></div>
 			</Box>
 		);
 	} else {
 		return (
-			<Box flexDirection={'row'} style={{ display: 'flex' }} sx={{ m: '10px 0px' }} component={'div'}>
-				<Avatar alt={'jonik'} src={'/img/profile/defaultUser.svg'} />
-				<div className={'msg_left'}></div>
+			<Box flexDirection={"row"} style={{ display: "flex" }} sx={{ m: "10px 0px" }} component={"div"}>
+				<Avatar alt={"jonik"} src={"/img/profile/defaultUser.svg"} />
+				<div className={"msg_left"}></div>
 			</Box>
 		);
 	}
@@ -36,7 +37,7 @@ const Chat = () => {
 	const [messagesList, setMessagesList] = useState([]);
 	const [onlineUsers, setOnlineUsers] = useState<number>(0);
 	const textInput = useRef(null);
-	const [message, setMessage] = useState<string>('');
+	const [message, setMessage] = useState<string>("");
 	const [open, setOpen] = useState(false);
 	const [openButton, setOpenButton] = useState(false);
 	const router = useRouter();
@@ -68,7 +69,7 @@ const Chat = () => {
 
 	const getKeyHandler = (e: any) => {
 		try {
-			if (e.key == 'Enter') {
+			if (e.key == "Enter") {
 				onClickHandler();
 			}
 		} catch (err: any) {
@@ -85,56 +86,49 @@ const Chat = () => {
 					{open ? <CloseFullscreenIcon /> : <MarkChatUnreadIcon />}
 				</button>
 			) : null}
-			<Stack className={`chat-frame ${open ? 'open' : ''}`}>
-				<Box className={'chat-top'} component={'div'}>
-					<div style={{ fontFamily: 'Nunito' }}>Online Chat</div>
-					<Badge
-						style={{
-							margin: '-30px 0 0 20px',
-							color: '#33c1c1',
-							background: 'none',
-						}}
-						badgeContent={4}
-					/>
+			<Stack className={`chat-frame ${open ? "open" : ""}`}>
+				<Box className={"chat-top"} component={"div"}>
+					<div style={{ fontFamily: "Nunito" }}>Online Chat</div>
+					<RippleBadge style={{ margin: "-18px 0 0 21px" }} badgeContent={onlineUsers} />
 				</Box>
-				<Box className={'chat-content'} id="chat-content" ref={chatContentRef} component={'div'}>
+				<Box className={"chat-content"} id="chat-content" ref={chatContentRef} component={"div"}>
 					<ScrollableFeed>
-						<Stack className={'chat-main'}>
-							<Box flexDirection={'row'} style={{ display: 'flex' }} sx={{ m: '10px 0px' }} component={'div'}>
-								<div className={'msg-left'}>Welcome to Live chat!</div>
+						<Stack className={"chat-main"}>
+							<Box flexDirection={"row"} style={{ display: "flex" }} sx={{ m: "10px 0px" }} component={"div"}>
+								<div className={"welcome"}>Welcome to Live chat!</div>
 							</Box>
 							{messagesList}
 							<>
 								<Box
-									component={'div'}
-									flexDirection={'row'}
-									style={{ display: 'flex' }}
-									alignItems={'flex-end'}
-									justifyContent={'flex-end'}
-									sx={{ m: '10px 0px' }}
+									component={"div"}
+									flexDirection={"row"}
+									style={{ display: "flex" }}
+									alignItems={"flex-end"}
+									justifyContent={"flex-end"}
+									sx={{ m: "10px 0px" }}
 								>
-									<div className={'msg-right'}>hi</div>
+									<div className={"msg-right"}>hi</div>
 								</Box>
-								<Box flexDirection={'row'} style={{ display: 'flex' }} sx={{ m: '10px 0px' }} component={'div'}>
-									<Avatar alt={'jonik'} src={'/img/profile/defaultUser.svg'} />
-									<div className={'msg-left'}>Hi</div>
+								<Box flexDirection={"row"} style={{ display: "flex" }} sx={{ m: "10px 0px" }} component={"div"}>
+									<Avatar alt={"jonik"} src={"/img/profile/defaultUser.svg"} />
+									<div className={"msg-left"}>Hi</div>
 								</Box>
 							</>
 						</Stack>
 					</ScrollableFeed>
 				</Box>
-				<Box className={'chat-bott'} component={'div'}>
+				<Box className={"chat-bott"} component={"div"}>
 					<input
 						ref={textInput}
-						type={'text'}
-						name={'message'}
-						className={'msg-input'}
-						placeholder={'Type message'}
+						type={"text"}
+						name={"message"}
+						className={"msg-input"}
+						placeholder={"Type message"}
 						onChange={getInputMessageHandler}
 						onKeyDown={getKeyHandler}
 					/>
-					<button className={'send-msg-btn'} onClick={onClickHandler}>
-						<SendIcon style={{ color: '#fff' }} />
+					<button className={"send-msg-btn"} onClick={onClickHandler}>
+						<SendIcon style={{ color: "#fff" }} />
 					</button>
 				</Box>
 			</Stack>
